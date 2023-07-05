@@ -1,22 +1,15 @@
 package accessory
 
 import (
-	"github.com/google/gousb"
 	"testing"
 )
 
 func TestGetProtocol(t *testing.T) {
-	devices, err := gousb.NewContext().OpenDevices(func(desc *gousb.DeviceDesc) bool {
-		return true
-	})
+	devices, err := GetDevices(1)
 	if err != nil {
 		t.Error(err)
 	}
 	for _, v := range devices {
-		p, err := getProtocol(v)
-		if err != nil {
-			t.Error(err)
-		}
-		t.Log(p)
+		t.Log(v.Protocol)
 	}
 }

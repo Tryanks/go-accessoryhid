@@ -59,8 +59,11 @@ func getProtocol(dev *gousb.Device) (protocol uint16, err error) {
 		return 0, ErrorNoAccessoryDevice
 	}
 	data := make([]byte, 2)
-	_, err = dev.Control(RTypeIn, AccessoryGetProtocol, 0, 0, data)
+	n, err := dev.Control(RTypeIn, AccessoryGetProtocol, 0, 0, data)
 	if err != nil {
+		return 0, err
+	}
+	if n != 2 {
 		return 0, ErrorFailedToGetProtocol
 	}
 	protocol = binary.LittleEndian.Uint16(data)
