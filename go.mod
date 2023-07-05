@@ -1,4 +1,4 @@
-module github.com/Tryanks/go-aoahid
+module github.com/Tryanks/go-accessoryhid
 
 go 1.20
 
