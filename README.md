@@ -19,7 +19,7 @@ Example:
 ```go
 package main
 
-import accessory "github.com/Tryanks/go-aoahid")
+import accessory "github.com/Tryanks/go-aoahid"
 
 func main() {
     devices, err := accessory.GetDevices(2)
