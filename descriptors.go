@@ -1,4 +1,4 @@
-package go_aoahid
+package accessory
 
 // MouseReportDesc is the HID report descriptor for a mouse.
 var MouseReportDesc = []byte{

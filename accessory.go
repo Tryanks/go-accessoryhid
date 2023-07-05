@@ -1,4 +1,4 @@
-package go_aoahid
+package accessory
 
 type Accessory struct {
 	hidID        uint16

@@ -1,4 +1,4 @@
-package go_aoahid
+package accessory
 
 import "errors"
 

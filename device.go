@@ -1,4 +1,4 @@
-package go_aoahid
+package accessory
 
 import "github.com/google/gousb"
 
