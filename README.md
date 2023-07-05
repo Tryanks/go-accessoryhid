@@ -19,7 +19,7 @@ Example:
 ```go
 package main
 
-import accessory "github.com/Tryanks/go-aoahid"
+import accessory "github.com/Tryanks/go-aoahid")
 
 func main() {
     devices, err := accessory.GetDevices(2)
@@ -27,6 +27,7 @@ func main() {
         panic(err)
     }
     phone := devices[0]
+	defer phone.Close()
     keyboard, err := phone.Register(accessory.KeyboardReportDesc) // Register keyboard report descriptor
     err = keyboard.SendEvent([]byte{
         0x00, 0x00, 0x04, 0x00, 0x00, 0x00,
