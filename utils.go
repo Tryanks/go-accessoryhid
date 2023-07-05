@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"github.com/google/gousb"
 	"math/rand"
+	"time"
 )
 
 // SkipList is a list of vendor IDs that are known to not support the accessory protocol
@@ -38,11 +39,15 @@ func GetDevices(protocolVersion uint16) (accessoryList []AccessoryDevice, err er
 				waitChan <- nil
 				return
 			}
-			waitChan <- NewAccessoryDevice(d, p)
+			manu, err := d.Manufacturer()
+			if err != nil {
+				waitChan <- nil
+				return
+			}
+			waitChan <- NewAccessoryDevice(d, p, manu)
 		}()
 	}
 	for _, d := range devices {
-		d := d
 		accessory := <-waitChan
 		if accessory != nil {
 			accessoryList = append(accessoryList, *accessory)
@@ -55,6 +60,7 @@ func GetDevices(protocolVersion uint16) (accessoryList []AccessoryDevice, err er
 
 // getProtocol return the protocol version of the device
 func getProtocol(dev *gousb.Device) (protocol uint16, err error) {
+	dev.ControlTimeout = 3 * time.Second
 	if dev == nil {
 		return 0, ErrorNoAccessoryDevice
 	}

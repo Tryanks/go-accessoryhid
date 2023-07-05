@@ -4,17 +4,19 @@ import "github.com/google/gousb"
 
 // AccessoryDevice Connected Android Device
 type AccessoryDevice struct {
-	Device   *gousb.Device
-	Protocol uint16
-	hidList  []uint16
+	Device       *gousb.Device
+	Protocol     uint16
+	Manufacturer string
+	hidList      []uint16
 }
 
 // NewAccessoryDevice Create a new AccessoryDevice
-func NewAccessoryDevice(device *gousb.Device, protocol uint16) *AccessoryDevice {
+func NewAccessoryDevice(device *gousb.Device, protocol uint16, manu string) *AccessoryDevice {
 	return &AccessoryDevice{
-		Device:   device,
-		Protocol: protocol,
-		hidList:  make([]uint16, 0),
+		Device:       device,
+		Protocol:     protocol,
+		Manufacturer: manu,
+		hidList:      make([]uint16, 0),
 	}
 }
 
