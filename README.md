@@ -1,5 +1,5 @@
 # Introduction
-The go-aoahid package is an implementation of the [AOA 2.0](https://source.android.com/devices/accessories/aoa2) protocol for Android HID devices.
+The go-accessoryhid package is an implementation of the [AOA 2.0](https://source.android.com/devices/accessories/aoa2) protocol for Android HID devices.
 
 Dependence on [gousb](https://github.com/google/gousb) and [libusb-1.0](https://github.com/libusb/libusb/wiki).
 
@@ -10,7 +10,7 @@ TODO.
 - [gousb](https://github.com/google/gousb#dependencies)
 
 ```bash
-go get -u github.com/Tryanks/go-aoahid
+go get -u github.com/Tryanks/go-accessoryhid
 ```
 
 # Usage
@@ -19,7 +19,7 @@ Example:
 ```go
 package main
 
-import accessory "github.com/Tryanks/go-aoahid"
+import accessory "github.com/Tryanks/go-accessoryhid"
 
 func main() {
     devices, err := accessory.GetDevices(2)
