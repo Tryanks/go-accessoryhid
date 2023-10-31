@@ -5,6 +5,7 @@ import (
 	"github.com/google/gousb"
 	"math/rand"
 	"time"
+	"fmt"
 )
 
 // SkipList is a list of vendor IDs that are known to not support the accessory protocol
@@ -17,8 +18,8 @@ var SkipList = []uint16{
 }
 
 // GetDevices return a list of devices that support the specified protocol version
-func GetDevices(protocolVersion uint16) (accessoryList []AccessoryDevice, err error) {
-	accessoryList = make([]AccessoryDevice, 0)
+func GetDevices(protocolVersion uint16) (accessoryList []*AccessoryDevice, err error) {
+	accessoryList = make([]*AccessoryDevice, 0)
 	devices, err := gousb.NewContext().OpenDevices(func(desc *gousb.DeviceDesc) bool {
 		for _, id := range SkipList {
 			if desc.Vendor == gousb.ID(id) {
@@ -30,37 +31,27 @@ func GetDevices(protocolVersion uint16) (accessoryList []AccessoryDevice, err er
 	if err != nil {
 		return nil, err
 	}
-	waitChan := make(chan *AccessoryDevice, len(devices))
 	for _, d := range devices {
-		d := d
-		go func() {
-			p, err := getProtocol(d)
-			if err != nil || p < protocolVersion {
-				waitChan <- nil
-				return
-			}
-			manu, err := d.Manufacturer()
-			if err != nil {
-				waitChan <- nil
-				return
-			}
-			waitChan <- NewAccessoryDevice(d, p, manu)
-		}()
-	}
-	for _, d := range devices {
-		accessory := <-waitChan
-		if accessory != nil {
-			accessoryList = append(accessoryList, *accessory)
+		p, err := getProtocol(d)
+		if err != nil || p < protocolVersion {
+			d.Close()
+			fmt.Println("No Protocol!")
 			continue
 		}
-		_ = d.Close()
+		manu, err := d.Manufacturer()
+		if err != nil {
+			d.Close()
+			fmt.Println("No ManuFacturer!")
+			continue
+		}
+		accessoryList = append(accessoryList, NewAccessoryDevice(d, p, manu))
 	}
 	return accessoryList, nil
 }
 
 // getProtocol return the protocol version of the device
 func getProtocol(dev *gousb.Device) (protocol uint16, err error) {
-	dev.ControlTimeout = 3 * time.Second
+	dev.ControlTimeout = 500 * time.Millisecond
 	if dev == nil {
 		return 0, ErrorNoAccessoryDevice
 	}
