@@ -1,6 +1,6 @@
 module github.com/Tryanks/go-accessoryhid
 
-go 1.20
+go 1.21
 
 require github.com/google/gousb v1.1.2
 
