@@ -19,6 +19,10 @@ var SkipList = []uint16{
 
 // GetDevices return a list of devices that support the specified protocol version
 func GetDevices(protocolVersion uint16) (accessoryList []*AccessoryDevice, err error) {
+	return getDevices(protocolVersion, false)
+}
+
+func getDevices(protocolVersion uint16, logInfo bool) (accessoryList []*AccessoryDevice, err error) {
 	accessoryList = make([]*AccessoryDevice, 0)
 	devices, err := gousb.NewContext().OpenDevices(func(desc *gousb.DeviceDesc) bool {
 		for _, id := range SkipList {
@@ -34,14 +38,18 @@ func GetDevices(protocolVersion uint16) (accessoryList []*AccessoryDevice, err e
 	for _, d := range devices {
 		p, err := getProtocol(d)
 		if err != nil || p < protocolVersion {
-			d.Close()
-			fmt.Println("No Protocol!")
+			_ = d.Close()
+			if logInfo {
+				fmt.Println("No Protocol!")
+			}
 			continue
 		}
 		manu, err := d.Manufacturer()
 		if err != nil {
-			d.Close()
-			fmt.Println("No ManuFacturer!")
+			_ = d.Close()
+			if logInfo {
+				fmt.Println("No ManuFacturer!")
+			}
 			continue
 		}
 		accessoryList = append(accessoryList, NewAccessoryDevice(d, p, manu))
