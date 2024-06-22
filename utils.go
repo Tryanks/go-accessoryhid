@@ -2,6 +2,7 @@ package accessory
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"github.com/google/gousb"
 	"math/rand"
@@ -15,6 +16,55 @@ var SkipList = []uint16{
 	0x8087, // Intel Corp.
 	0x1d6b, // Linux Foundation
 	0x2109, // VIA Labs, Inc.
+}
+
+// GetDevice return a single device match protocol version 2
+func GetDevice() (device *AccessoryDevice, err error) {
+	devices, err := GetDevices(2)
+	if err != nil {
+		return nil, err
+	}
+	if len(devices) == 0 {
+		return nil, errors.New("no device found")
+	}
+	defer func() {
+		if len(devices) > 1 {
+			for _, v := range devices[1:] {
+				_ = v.Close()
+			}
+		}
+	}()
+	return devices[0], nil
+}
+
+// GetDeviceWithSerial return a device match serial with device.SerialNumber()
+func GetDeviceWithSerial(serial string) (device *AccessoryDevice, err error) {
+	devices, err := GetDevices(2)
+	if err != nil {
+		return nil, err
+	}
+	if len(devices) == 0 {
+		return nil, errors.New("no device found")
+	}
+	defer func() {
+		if len(devices) > 1 {
+			for _, v := range devices {
+				if v != device {
+					_ = v.Close()
+				}
+			}
+		}
+	}()
+	for _, device = range devices {
+		s, err := device.Device.SerialNumber()
+		if err != nil {
+			continue
+		}
+		if s == serial {
+			return
+		}
+	}
+	return nil, errors.New("device not found")
 }
 
 // GetDevices return a list of devices that support the specified protocol version

@@ -13,4 +13,14 @@ func TestGetProtocol(t *testing.T) {
 		t.Log(v.Protocol)
 		_ = v.Close()
 	}
+	device, err := GetDevice()
+	if err != nil {
+		t.Error(err)
+	}
+	_ = device.Close()
+	device, err = GetDeviceWithSerial("")
+	if err != nil {
+		t.Error(err)
+	}
+	_ = device.Close()
 }

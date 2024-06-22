@@ -20,6 +20,10 @@ func NewAccessoryDevice(device *gousb.Device, protocol uint16, manu string) *Acc
 	}
 }
 
+func (a *AccessoryDevice) SerialNumber() (string, error) {
+	return a.Device.SerialNumber()
+}
+
 func (a *AccessoryDevice) SendHidEvent(hidID uint16, event []byte) error {
 	_, err := a.Device.Control(RTypeOut, AccessorySendHidEvent, hidID, 0, event)
 	return err
