@@ -56,8 +56,8 @@ func GetDeviceWithSerial(serial string) (device *AccessoryDevice, err error) {
 		}
 	}()
 	for _, device = range devices {
-		s, err := device.Device.SerialNumber()
-		if err != nil {
+		s, err1 := device.Device.SerialNumber()
+		if err1 != nil {
 			continue
 		}
 		if s == serial {
