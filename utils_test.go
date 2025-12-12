@@ -16,11 +16,13 @@ func TestGetProtocol(t *testing.T) {
 	device, err := GetDevice()
 	if err != nil {
 		t.Error(err)
+	} else {
+		_ = device.Close()
 	}
-	_ = device.Close()
 	device, err = GetDeviceWithSerial("")
 	if err != nil {
 		t.Error(err)
+	} else {
+		_ = device.Close()
 	}
-	_ = device.Close()
 }

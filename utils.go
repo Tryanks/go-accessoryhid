@@ -4,9 +4,11 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/google/gousb"
 	"math/rand"
+	"sync"
 	"time"
+
+	"github.com/google/gousb"
 )
 
 // SkipList is a list of vendor IDs that are known to not support the accessory protocol
@@ -16,6 +18,18 @@ var SkipList = []uint16{
 	0x8087, // Intel Corp.
 	0x1d6b, // Linux Foundation
 	0x2109, // VIA Labs, Inc.
+}
+
+var (
+	usbContext *gousb.Context
+	ctxOnce    sync.Once
+)
+
+func getContext() *gousb.Context {
+	ctxOnce.Do(func() {
+		usbContext = gousb.NewContext()
+	})
+	return usbContext
 }
 
 // GetDevice return a single device match protocol version 2
@@ -74,7 +88,7 @@ func GetDevices(protocolVersion uint16) (accessoryList []*AccessoryDevice, err e
 
 func getDevices(protocolVersion uint16, logInfo bool) (accessoryList []*AccessoryDevice, err error) {
 	accessoryList = make([]*AccessoryDevice, 0)
-	devices, err := gousb.NewContext().OpenDevices(func(desc *gousb.DeviceDesc) bool {
+	devices, err := getContext().OpenDevices(func(desc *gousb.DeviceDesc) bool {
 		for _, id := range SkipList {
 			if desc.Vendor == gousb.ID(id) {
 				return false
