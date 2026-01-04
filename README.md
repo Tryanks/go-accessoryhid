@@ -22,11 +22,14 @@ package main
 
 import (
 	accessory "github.com/Tryanks/go-accessoryhid"
+	"github.com/google/gousb"
 	"time"
 )
 
 func main() {
-	devices, err := accessory.GetDevices(2)
+	ctx := gousb.NewContext()
+	defer ctx.Close()
+	devices, err := accessory.GetDevices(ctx, 2)
 	if err != nil {
 		panic(err)
 	}

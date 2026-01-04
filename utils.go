@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/google/gousb"
@@ -20,21 +19,9 @@ var SkipList = []uint16{
 	0x2109, // VIA Labs, Inc.
 }
 
-var (
-	usbContext *gousb.Context
-	ctxOnce    sync.Once
-)
-
-func getContext() *gousb.Context {
-	ctxOnce.Do(func() {
-		usbContext = gousb.NewContext()
-	})
-	return usbContext
-}
-
 // GetDevice return a single device match protocol version 2
-func GetDevice() (device *AccessoryDevice, err error) {
-	devices, err := GetDevices(2)
+func GetDevice(ctx *gousb.Context) (device *AccessoryDevice, err error) {
+	devices, err := GetDevices(ctx, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +39,8 @@ func GetDevice() (device *AccessoryDevice, err error) {
 }
 
 // GetDeviceWithSerial return a device match serial with device.SerialNumber()
-func GetDeviceWithSerial(serial string) (device *AccessoryDevice, err error) {
-	devices, err := GetDevices(2)
+func GetDeviceWithSerial(ctx *gousb.Context, serial string) (device *AccessoryDevice, err error) {
+	devices, err := GetDevices(ctx, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -82,13 +69,13 @@ func GetDeviceWithSerial(serial string) (device *AccessoryDevice, err error) {
 }
 
 // GetDevices return a list of devices that support the specified protocol version
-func GetDevices(protocolVersion uint16) (accessoryList []*AccessoryDevice, err error) {
-	return getDevices(protocolVersion, false)
+func GetDevices(ctx *gousb.Context, protocolVersion uint16) (accessoryList []*AccessoryDevice, err error) {
+	return getDevices(ctx, protocolVersion, false)
 }
 
-func getDevices(protocolVersion uint16, logInfo bool) (accessoryList []*AccessoryDevice, err error) {
+func getDevices(ctx *gousb.Context, protocolVersion uint16, logInfo bool) (accessoryList []*AccessoryDevice, err error) {
 	accessoryList = make([]*AccessoryDevice, 0)
-	devices, err := getContext().OpenDevices(func(desc *gousb.DeviceDesc) bool {
+	devices, err := ctx.OpenDevices(func(desc *gousb.DeviceDesc) bool {
 		for _, id := range SkipList {
 			if desc.Vendor == gousb.ID(id) {
 				return false
